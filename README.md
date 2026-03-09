@@ -98,6 +98,7 @@ php -S localhost:8000 -t public
 
 - `public/` – публичный корень, точка входа `index.php`, статические файлы.
 - `app/Controllers/` – контроллеры приложения.
+- `app/Models/` – модели приложения.
 - `app/Views/` – представления и layout‑ы.
 - `core/` – ядро фреймворка (`Application`, `Router`, `Request`, `Response`, `Database`, `Session`, `View` и др.).
 - `config/` – конфигурация приложения (`routes.php`, `init.php` и т.п.).
