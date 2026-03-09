@@ -11,7 +11,7 @@
         <?= $this->content ?>
 
         <footer class="footer">
-            <p><a href="https://github.com/ваш-репозиторий/spfw" 
+            <p><a href="https://github.com/StanislavVNikitin/spfw" 
 target="_blank">Документация и исходный код</a></p>
         </footer>
     </div>
