@@ -1,0 +1,14 @@
+{
+    "autoload": {
+        "psr-4": {
+            "PHPFramework\\": "core/",
+            "App\\": "app/"
+        }
+    },
+    "require": {
+        "symfony/var-dumper": "^7.4",
+        "twig/twig": "^3.0",
+        "ext-pdo": "*",
+        "phpmailer/phpmailer": "^7.0"
+    }
+}

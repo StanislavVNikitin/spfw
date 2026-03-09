@@ -1,0 +1,109 @@
+/* Стили для SPFW стартовой страницы */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.header {
+    background: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.header h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.header p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.content {
+    padding: 30px;
+}
+
+.code-block {
+    background: #2d3436;
+    color: #f7f7f7;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    overflow-x: auto;
+}
+
+.code-block h2 {
+    color: #3498db;
+    margin-bottom: 15px;
+}
+
+.language-php {
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+}
+
+.features ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.features li {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.features li:last-child {
+    border-bottom: none;
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    background: #ecf0f1;
+    border-top: 1px solid #ddd;
+}
+
+.footer a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .content {
+        padding: 20px 15px;
+    }
+
+    .code-block pre {
+        font-size: 0.9rem;
+    }
+}
