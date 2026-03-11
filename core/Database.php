@@ -7,6 +7,7 @@ namespace PHPFramework;
 //    select($table, $columns='*')
 //    update($table, array $data)
 //    delete($table)
+//    insert($table, array $data)
 //
 //    Расшираения
 //
@@ -43,6 +44,19 @@ namespace PHPFramework;
 //    $affected = $db->delete('sessions')
 //        ->where('user_id', 123)
 //        ->execute();
+//    // INSERT
+//    Вставка записи
+//    $db->insert('users', [
+//        'email' => 'user@example.com',
+//        'name'  => 'John',
+//    ])->execute();
+//    // Если нужен ID вставленной записи:
+//    $db->insert('users', [
+//        'email' => 'user@example.com',
+//        'name'  => 'John',
+//    ])->execute();
+//    $id = $db->getInsertId();
+
 
 
 
@@ -155,6 +169,31 @@ class Database
         }
 
         $this->builderSql = 'UPDATE ' . $this->quoteIdentifier($table) . ' SET ' . implode(', ', $sets);
+        return $this;
+    }
+
+    /**
+     * Starts INSERT query.
+     */
+    public function insert(string $table, array $data): static
+    {
+        $this->resetBuilder();
+
+        if (empty($data)) {
+            abort('Insert data cannot be empty.', 500);
+        }
+
+        $columns = [];
+        $placeholders = [];
+        foreach ($data as $col => $val) {
+            $columns[] = $this->quoteIdentifier((string)$col);
+            $placeholders[] = '?';
+            $this->builderParams[] = $val;
+        }
+
+        $this->builderSql = 'INSERT INTO ' . $this->quoteIdentifier($table)
+            . ' (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $placeholders) . ')';
+
         return $this;
     }
 
@@ -274,6 +313,9 @@ class Database
     public function getAssoc($key = 'id'): array
     {
         $data = [];
+
+        $this->runBuilderIfNeeded();
+
         while ($row = $this->stmt->fetch()) {
             $data[$row[$key]] = $row;
         }
@@ -321,15 +363,6 @@ class Database
         $this->query("SELECT * FROM `$tbl` WHERE  $key = ? LIMIT 1",[$value]);
         return $this->stmt->fetch();
     }
-
-//    public function findOrFail($tbl,$id)
-//    {
-//        $res = $this->findOne($tbl,$id);
-//        if (!$res) {
-//            abort();
-//        }
-//        return $res;
-//    }
 
 
     public function findOrFail($tbl, $value, $key = 'id')

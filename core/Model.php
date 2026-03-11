@@ -31,46 +31,36 @@ abstract class Model
 
     public function save(): false|string
     {
-        //insert into table(`title`,`content`) values (:title, :content)
-        //fields
-        $fields_keys = array_keys($this->attributes);
-        $fields = array_map(fn($field) => "`{$field}`", $fields_keys);
-        $fields = implode(',', $fields);
-
-        //values
-        $values_placeholders = array_map(fn($v) => ":{$v}", $fields_keys);
-        $values_placeholders = implode(',', $values_placeholders);
-        $query = "INSERT INTO `{$this->table}` ({$fields}) VALUES ({$values_placeholders})";
-        db()->query($query,$this->attributes);
+        db()->insert($this->table, $this->attributes)->execute();
         return db()->getInsertId();
 
     }
 
     public function update()
     {
-        //update table set `title`=:title ,`content`=:content where `id`=:id
         if(!isset($this->attributes[$this->pk])){
             return false;
         }
 
-        $fields = '';
-        foreach ($this->attributes as $key => $value){
-            if ($key != $this->pk){
-                $fields .= "`{$key}`=:{$key},";
-            }
+        $data = $this->attributes;
+        $id = $data[$this->pk];
+        unset($data[$this->pk]);
+        if (empty($data)) {
+            return 0;
         }
-        $fields = rtrim($fields,',');
-        $query = "UPDATE {$this->table} SET {$fields} WHERE `{$this->pk}`=:{$this->pk}";
-        db()->query($query,$this->attributes);
 
-        return db()->rowCount();
+        return db()
+            ->update($this->table, $data)
+            ->where($this->pk, $id)
+            ->execute();
     }
 
     public function delete(int $id): int
     {
-        $query = "DELETE FROM `{$this->table}` WHERE `{$this->pk}`={$id}";
-        db()->query($query);
-        return db()->rowCount();
+        return db()
+            ->delete($this->table)
+            ->where($this->pk, $id)
+            ->execute();
     }
 
 
@@ -191,9 +181,16 @@ abstract class Model
         $data = explode(':',$rule_value);
         if (str_contains($data[1],',')){
             $data_fields = explode(',',$data[1]);
-            return !db()->query("SELECT {$data_fields[0]} FROM {$data[0]} WHERE {$data_fields[0]} = ? AND {$data_fields[1]} !=?",[$value,$this->data_items[$data_fields[1]]])->getColumn();
+            return !db()
+                ->select($data[0], $data_fields[0])
+                ->where($data_fields[0], $value)
+                ->where($data_fields[1], '!=', $this->data_items[$data_fields[1]])
+                ->getColumn();
         }
-        return !db()->query("SELECT {$data[1]} FROM {$data[0]} WHERE {$data[1]} = ?",[$value])->getColumn();
+        return !db()
+            ->select($data[0], $data[1])
+            ->where($data[1], $value)
+            ->getColumn();
     }
 
     protected function file($value, $rule_value)
