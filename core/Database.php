@@ -252,7 +252,8 @@ class Database
         $direction = strtoupper(trim($direction));
         $direction = in_array($direction, ['ASC', 'DESC'], true) ? $direction : 'ASC';
 
-        $this->builderAppend('ORDER BY ' . $this->quoteIdentifier($column) . ' ' . $direction);
+        $prefix = str_contains($this->builderSql ?? '', ' ORDER BY ') ? ',' : 'ORDER BY';
+        $this->builderAppend($prefix . ' ' . $this->quoteIdentifier($column) . ' ' . $direction);
         return $this;
     }
 
@@ -265,6 +266,41 @@ class Database
     public function offset(int $offset): static
     {
         $this->builderAppend('OFFSET ' . max(0, $offset));
+        return $this;
+    }
+
+    /**
+     * Adds GROUP BY clause.
+     */
+    public function groupBy(string|array $columns): static
+    {
+        $cols = is_array($columns) ? $columns : [$columns];
+        $quoted = array_map(fn ($c) => $this->quoteIdentifier((string)$c), $cols);
+        $this->builderAppend('GROUP BY ' . implode(', ', $quoted));
+        return $this;
+    }
+
+    /**
+     * Adds raw ORDER BY expression (for complex cases).
+     */
+    public function orderByRaw(string $expression): static
+    {
+        $prefix = str_contains($this->builderSql ?? '', ' ORDER BY ') ? ',' : 'ORDER BY';
+        $this->builderAppend($prefix . ' ' . $expression);
+        return $this;
+    }
+
+    /**
+     * Fluent UPDATE ... SET column = column + ? ...
+     * Useful for counters like `views`.
+     */
+    public function increment(string $table, string $column, int|float $by = 1): static
+    {
+        $this->resetBuilder();
+        $col = $this->quoteIdentifier($column);
+        $this->builderSql = 'UPDATE ' . $this->quoteIdentifier($table)
+            . ' SET ' . $col . ' = ' . $col . ' + ?';
+        $this->builderParams[] = $by;
         return $this;
     }
 
